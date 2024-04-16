@@ -1,19 +1,16 @@
-import json
+import subprocess
 import time
-import base64
 import requests
+import platform
 import pytesseract
-from openai import OpenAI,Completion
+from openai import OpenAI
 from bs4 import BeautifulSoup
 from functools import lru_cache
 
 from .utils import *
 
-if os.path.exists('Tesseract-OCR/tesseract.exe'):           
-    tesseract_path = 'Tesseract-OCR/tesseract.exe'
-    pytesseract.pytesseract.tesseract_cmd = tesseract_path
 
-client = OpenAI(api_key = OPENAI_API_KEY)
+openai_client = OpenAI(api_key = OPENAI_API_KEY)
 
 def get_image_result(image_path):
     text = pytesseract.image_to_string(image_path, lang="fra")
@@ -31,7 +28,7 @@ def get_image_result(image_path):
         "address": "",
     }
     """
-    response = client.chat.completions.create(
+    response = openai_client.chat.completions.create(
     model="gpt-3.5-turbo",
     messages=[
         {
@@ -115,3 +112,23 @@ def process_image(image):
         print(e)
         
     return result, cost
+
+def is_tesseract_installed():
+    os_name = platform.system()
+    installed = False
+    if os_name == "Windows":
+        if os.path.exists('C:/Program Files/Tesseract-OCR'):           
+            tesseract_path = 'C:/Program Files/Tesseract-OCR/tesseract.exe'
+            pytesseract.pytesseract.tesseract_cmd = tesseract_path
+            installed = True
+    else:
+        try:
+            result = subprocess.run(['tesseract', '--version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            if result.returncode == 0:
+                installed = True
+        except FileNotFoundError:
+            pass
+        
+    if installed and "fra" in pytesseract.get_languages():
+        return True
+    return False

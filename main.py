@@ -6,7 +6,7 @@ import pandas as pd
 from tqdm import tqdm
 from src.pdf_processing import pdf_to_images
 from src.excel_util import save_table
-from src.image_processing import process_image
+from src.image_processing import process_image, is_tesseract_installed
 from src.utils import *
 
 
@@ -43,4 +43,7 @@ def main():
         print(f"Completed in {int(time.time() - ptime)} sec\nTotal : {int(time.time()-time_start)} sec")
         
 if __name__ == "__main__":
-    main()
+    if is_tesseract_installed():
+        main()
+    else:
+        input("! ERROR !\n\ntesseract-fra is not Installed")
