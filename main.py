@@ -63,7 +63,8 @@ def main():
         print(
             f"Completed in {int(time.time() - ptime)} sec\nTotal : {int(time.time()-time_start)} sec"
         )
-
+        
+    input("All Files Completed")
 
 if __name__ == "__main__":
     main()

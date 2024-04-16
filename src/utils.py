@@ -12,7 +12,7 @@ def resource_path(relative_path):
 def extract_number(filename):
     return int(filename.split("-")[1].split(".")[0])
 
-load_dotenv(dotenv_path=resource_path("../.env"))
+load_dotenv(dotenv_path=resource_path(".env"))
 
 
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
