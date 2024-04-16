@@ -11,16 +11,17 @@ from src.utils import *
 
 
 def main():
-    time_start = time.time()
     pdf_files = [
         file for file in os.listdir(INPUT_FOLDER) if file.lower().endswith(".pdf")
     ]
 
     for pdf in pdf_files:
-        ptime = time.time()
+        time_start = time.time()
+        total_cost = 0
+        pdf_path = f"{INPUT_FOLDER}/{pdf}"
+        
         print(f"\nProcess Started For {pdf}\n")
 
-        pdf_path = f"{INPUT_FOLDER}/{pdf}"
         pdf_to_images(pdf_path, IMAGE_FOLDER, 300)
 
         images = [
@@ -30,7 +31,6 @@ def main():
         data = []
 
         print("\nSTART :\n")
-        total_cost = 0
         progress_bar = tqdm(images, ncols=60, bar_format="{percentage:3.0f}%|{bar}| {n_fmt}/{total_fmt}")
         for image in progress_bar:
             result, cost = process_image(image)
@@ -59,12 +59,12 @@ def main():
         )
 
         shutil.move(pdf_path, f"{COMPLETED_FOLDER}/{pdf}")
-        print(f"\n\nTotal Cost : ${total_cost}")
+        print(f"\n\nTotal Cost : ${total_cost}\n")
         print(
-            f"Completed in {int(time.time() - ptime)} sec\nTotal : {int(time.time()-time_start)} sec"
+            f"Completed in {int(time.time() - time_start)} sec"
         )
         
-    input("All Files Completed")
+    input("\n\nAll Files Completed")
 
 if __name__ == "__main__":
     main()
