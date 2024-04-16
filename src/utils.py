@@ -15,7 +15,7 @@ def extract_number(filename):
 load_dotenv(dotenv_path=resource_path("../.env"))
 
 
-API_KEY = os.environ["API_KEY"]
+OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 INPUT_FOLDER = "./Input"
 OUTPUT_FOLDER = "./Output"
 IMAGE_FOLDER = "./images"
