@@ -6,7 +6,7 @@ import pandas as pd
 from tqdm import tqdm
 from src.pdf_processing import pdf_to_images
 from src.excel_util import save_table
-from src.image_processing import process_image, get_total
+from src.image_processing import process_image
 from src.utils import *
 
 
