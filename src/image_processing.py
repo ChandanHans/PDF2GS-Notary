@@ -109,6 +109,7 @@ def process_image(image):
             while True:
                 try:
                     phone, email, website = get_contact(notary)
+                    break
                 except Exception as e:
                     print()
                     print(e)
