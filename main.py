@@ -21,7 +21,7 @@ def main():
         print(f"\nProcess Started For {pdf}\n")
 
         pdf_path = f"{INPUT_FOLDER}/{pdf}"
-        pdf_to_images(pdf_path, IMAGE_FOLDER, 200)
+        pdf_to_images(pdf_path, IMAGE_FOLDER, 300)
 
         images = [
             file for file in os.listdir(IMAGE_FOLDER) if file.lower().endswith(".png")
