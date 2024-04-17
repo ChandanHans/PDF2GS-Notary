@@ -27,7 +27,7 @@ def get_image_result(image_path):
         "person full name": "" (You can get it right at the beginning),
         "declarant name": "",
         "Acte de notorieti": (date only),
-        "certificate notary name": (after Acte de notorieti) (only name, don't include mr. or mrs.),
+        "certificate notary name": (after Acte de notorieti) (don't include Maitre) (only name),
         "address": "",
     }
     """

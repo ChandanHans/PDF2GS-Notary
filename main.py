@@ -59,7 +59,7 @@ def main():
         )
 
         shutil.move(pdf_path, f"{COMPLETED_FOLDER}/{pdf}")
-        # print(f"\n\nTotal Cost : ${total_cost}\n")
+        print(f"\n\nTotal Cost : ${total_cost}\n")
         print(
             f"Completed in {int(time.time() - time_start)} sec"
         )
