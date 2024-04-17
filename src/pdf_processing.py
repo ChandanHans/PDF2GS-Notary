@@ -1,7 +1,22 @@
+import os
 import fitz
 from tqdm import tqdm
 
+
+def delete_images(directory_path):
+    print("\nDelete Old Images...")
+    try:
+        for filename in os.listdir(directory_path):
+            file_path = os.path.join(directory_path, filename)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+    except:
+        if not os.path.exists(directory_path):
+            os.makedirs(directory_path)
+        pass
+
 def pdf_to_images(pdf_path, output_folder, resolution=200):
+    delete_images(output_folder)
     doc = fitz.open(pdf_path)
     for i in tqdm(range(len(doc)), ncols=60, bar_format="{percentage:3.0f}%|{bar}| {n_fmt}/{total_fmt}"):
         page = doc.load_page(i)
