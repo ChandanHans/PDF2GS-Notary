@@ -49,7 +49,6 @@ def get_image_result(image_path):
         response.usage.completion_tokens / 1000
     ) * 0.0015
     result = eval(response.choices[0].message.content)
-
     return result, cost
 
 

@@ -14,7 +14,7 @@ def delete_images(directory_path):
             os.makedirs(directory_path)
         pass
 
-def pdf_to_images(pdf_path, output_folder, resolution=200):
+def pdf_to_images(pdf_path, output_folder, resolution):
     delete_images(output_folder)
     print("\nGetting All Images From PDF...")
     doc = fitz.open(pdf_path)

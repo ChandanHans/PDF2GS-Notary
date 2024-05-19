@@ -22,7 +22,7 @@ def main():
         
         print(f"\nProcess Started For {pdf}\n")
 
-        pdf_to_images(pdf_path, IMAGE_FOLDER, 300)
+        pdf_to_images(pdf_path, IMAGE_FOLDER, 200)
 
         images = [
             file for file in os.listdir(IMAGE_FOLDER) if file.lower().endswith(".png")
@@ -54,8 +54,9 @@ def main():
             "Status",
         ]
         df = df.replace([pd.NA, pd.NaT, float("inf"), float("-inf")], "N/A")
+        excel_path = pdf_path.replace(".pdf", ".xlsx").replace(INPUT_FOLDER, OUTPUT_FOLDER)
         save_table(
-            df, pdf_path.replace(".pdf", ".xlsx").replace(INPUT_FOLDER, OUTPUT_FOLDER)
+            df, excel_path
         )
 
         shutil.move(pdf_path, f"{COMPLETED_FOLDER}/{pdf}")
