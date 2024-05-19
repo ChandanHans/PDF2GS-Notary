@@ -22,12 +22,12 @@ def main():
         
         print(f"\nProcess Started For {pdf}\n")
 
-        pdf_to_images(pdf_path, IMAGE_FOLDER, 200)
+        # pdf_to_images(pdf_path, IMAGE_FOLDER, 200)
 
         images = [
             file for file in os.listdir(IMAGE_FOLDER) if file.lower().endswith(".png")
         ]
-        images = sorted(images, key=extract_number)
+        images = sorted(images, key=extract_number)[:5]
         data = []
 
         print("\nSTART :\n")
