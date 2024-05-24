@@ -32,7 +32,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Create .env File
-        run: echo 'OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}' > .env
+        run: echo 'GPT_KEY=${{ secrets.GPT_KEY }}','CREDS_JSON=${{ secrets.CREDS_JSON }}' > .env
 
       - name: Create Date File
         run: python -c "import datetime; print(datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))" > time.txt

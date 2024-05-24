@@ -10,18 +10,18 @@ import pandas as pd
 from tqdm import tqdm
 from src.pdf_processing import pdf_to_images
 from src.excel_util import save_table
-from src.image_processing import process_image
+from src.image_processing import process_image, check_for_tesseract
 from src.utils import *
 
 
 def main():
+    check_for_tesseract()
     pdf_files = [
         file for file in os.listdir(INPUT_FOLDER) if file.lower().endswith(".pdf")
     ]
 
     for pdf in pdf_files:
         time_start = time.time()
-        total_cost = 0
         pdf_path = f"{INPUT_FOLDER}/{pdf}"
         
         print(f"\nProcess Started For {pdf}\n")
@@ -37,8 +37,7 @@ def main():
         print("\nSTART :\n")
         progress_bar = tqdm(images, ncols=60, bar_format="{percentage:3.0f}%|{bar}| {n_fmt}/{total_fmt}")
         for image in progress_bar:
-            result, cost = process_image(image)
-            total_cost += cost
+            result = process_image(image)
             if result:
                 data.append(result)
         print()
@@ -46,25 +45,18 @@ def main():
         df = pd.DataFrame(data)
         df.columns = [
             "Name",
-            "DOB",
-            "DOD",
-            "Declarant",
             "Data Of Notoriety",
             "Notary",
-            "Address",
-            "Phone",
+            "Phone",            
             "Email",
-            "Website",
             "Status",
         ]
-        df = df.replace([pd.NA, pd.NaT, float("inf"), float("-inf")], "N/A")
         excel_path = pdf_path.replace(".pdf", ".xlsx").replace(INPUT_FOLDER, OUTPUT_FOLDER)
         save_table(
             df, excel_path
         )
 
         shutil.move(pdf_path, f"{COMPLETED_FOLDER}/{pdf}")
-        print(f"\n\nTotal Cost : ${total_cost}\n")
         print(
             f"Completed in {int(time.time() - time_start)} sec"
         )

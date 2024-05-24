@@ -5,7 +5,7 @@ from openpyxl.worksheet.table import Table, TableStyleInfo
 from openpyxl.styles import PatternFill
 
 
-def create_dropdown(df, file_path):
+def create_dropdown(df, file_path, col = 5):
     color_options = ["à envoyer", "draft", "envoyé", "pas trouvé"]
     color_codes = ["#ff8e8e", "#ffeeb0", "#b2ffaf", "#daeef3"]
 
@@ -19,7 +19,7 @@ def create_dropdown(df, file_path):
     for idx, row in df.iterrows():
         worksheet.write_row(idx + 1, 0, row)
 
-    col = 10
+    
     for row in range(1, len(df) + 1):
         validation = {
             "validate": "list",
@@ -30,25 +30,18 @@ def create_dropdown(df, file_path):
         worksheet.write(row, col, color_options[0])
 
         for i, option in enumerate(color_options):
-            color_range = f"K{row + 1}"
+            color_range = f"F{row + 1}"
 
             worksheet.conditional_format(
                 color_range,
                 {
                     "type": "formula",
-                    "criteria": f'=$K${row + 1}="{option}"',
+                    "criteria": f'=$F${row + 1}="{option}"',
                     "format": workbook.add_format({"bg_color": color_codes[i]}),
                 },
             )
 
     workbook.close()
-
-
-def hide_columns(worksheet: Worksheet, column_list):
-    for col_letter in column_list:
-        column = worksheet.column_dimensions[col_letter]
-        column.hidden = True
-
 
 def is_full_name(name: str):
     words = name.split()
@@ -64,8 +57,10 @@ def verify_cell(worksheet: Worksheet):
     )
     for row in worksheet.iter_rows(min_row=2):
         for cell in row:
-            if cell.value in ["N/A", "Not Found"] or (
-                cell.column_letter in ["A", "F"] and not is_full_name(cell.value)
+            if cell.column_letter == "D":
+                continue
+            if not cell.value or (
+                cell.column_letter in ["A", "C"] and not is_full_name(cell.value)
             ):
                 cell.fill = fill_colur
 
@@ -73,9 +68,7 @@ def save_table(df, file_path):
     create_dropdown(df, file_path)
     workbook = load_workbook(file_path)
     worksheet = workbook.active
-
-    columns_to_hide = ["B", "C", "D", "H", "G", "J"]
-    hide_columns(worksheet, columns_to_hide)
+    
     verify_cell(worksheet)
 
     table_style = TableStyleInfo(

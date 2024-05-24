@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 from dotenv import load_dotenv
@@ -15,7 +16,9 @@ def extract_number(filename):
 load_dotenv(dotenv_path=resource_path(".env"))
 
 
-OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
+GPT_KEY = os.environ["GPT_KEY"]
+CREDS_JSON = json.loads(os.environ["CREDS_JSON"])
+ANNUAIRE_SHEET_KEY = "1NBWDbmuXHKr6yWsEvxJhio4uaUPKol6_dJvtgKJCDhc"
 INPUT_FOLDER = "./Input"
 OUTPUT_FOLDER = "./Output"
 IMAGE_FOLDER = "./images"
