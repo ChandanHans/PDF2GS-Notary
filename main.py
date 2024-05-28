@@ -1,4 +1,4 @@
-from vcs import check_for_updates
+from src.vcs import check_for_updates
 
 check_for_updates()
 
@@ -12,7 +12,7 @@ from src.pdf_processing import pdf_to_images
 from src.excel_util import save_table
 from src.image_processing import process_image, check_for_tesseract
 from src.utils import *
-
+from src.constants import *
 
 def main():
     check_for_tesseract()
@@ -64,4 +64,12 @@ def main():
     input("\n\nAll Files Completed")
 
 if __name__ == "__main__":
+    if not os.path.exists(INPUT_FOLDER):
+        os.makedirs(INPUT_FOLDER)
+    if not os.path.exists(OUTPUT_FOLDER):
+        os.makedirs(OUTPUT_FOLDER)
+    if not os.path.exists(IMAGE_FOLDER):
+        os.makedirs(IMAGE_FOLDER)
+    if not os.path.exists(COMPLETED_FOLDER):
+        os.makedirs(COMPLETED_FOLDER)
     main()

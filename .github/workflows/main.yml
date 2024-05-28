@@ -1,9 +1,7 @@
 name: Create EXE and Release
 
 on:
-  push:
-    branches:
-      - main  # Adjust to your branch name
+  workflow_dispatch:
 
 jobs:
   build-and-release:

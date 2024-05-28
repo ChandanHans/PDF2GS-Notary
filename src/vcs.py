@@ -9,7 +9,9 @@ import subprocess
 
 def resource_path(relative_path):
     """Get absolute path to resource, works for dev and for PyInstaller"""
-    base_path = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
+    base_path = getattr(
+        sys, "_MEIPASS", os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    )
     return os.path.join(base_path, relative_path)
 
 
@@ -17,7 +19,9 @@ OWNER = "ChandanHans"
 REPO_NAME = "PDF2XL"
 EXE_NAME = "PDF2XL.exe"
 RELEASE_TAG = "v1.0.0"
-EXE_URL = f"https://github.com/{OWNER}/{REPO_NAME}/releases/download/{RELEASE_TAG}/PDF2XL.exe"
+EXE_URL = (
+    f"https://github.com/{OWNER}/{REPO_NAME}/releases/download/{RELEASE_TAG}/PDF2XL.exe"
+)
 REPO_API_URL = (
     f"https://api.github.com/repos/{OWNER}/{REPO_NAME}/git/trees/main?recursive=1"
 )
