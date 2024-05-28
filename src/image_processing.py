@@ -9,6 +9,7 @@ from functools import lru_cache
 from unidecode import unidecode
 
 from .annuaire_data import get_annuaire_data
+from .constants import *
 from .utils import *
 
 

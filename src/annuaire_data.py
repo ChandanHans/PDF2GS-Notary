@@ -4,6 +4,8 @@ from google.oauth2 import service_account
 from unidecode import unidecode
 import pandas as pd
 
+
+from .constants import *
 from .utils import *
 
 
