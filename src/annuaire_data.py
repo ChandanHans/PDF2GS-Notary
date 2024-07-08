@@ -27,8 +27,8 @@ def get_annuaire_sheet_data():
 @lru_cache(maxsize=None)
 def get_annuaire_data():
     sheet_data = get_annuaire_sheet_data()
-    header = sheet_data[1]
-    rows = sheet_data[2:]
+    header = sheet_data[0]
+    rows = sheet_data[1:]
     result = []
     df = pd.DataFrame(rows, columns=header)
     for _, row in df.iterrows():
