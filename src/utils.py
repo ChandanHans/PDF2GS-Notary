@@ -1,7 +1,6 @@
-import json
 import os
 import sys
-from dotenv import load_dotenv
+from time import sleep
 
 
 def resource_path(relative_path):
@@ -15,3 +14,9 @@ def resource_path(relative_path):
 def extract_number(filename: str):
     return int(filename.split("-")[1].split(".")[0])
 
+def countdown(text: str, t: int):
+    while t >= 0:
+        print(f"{text} : {t} sec", end="\r")
+        sleep(1)
+        t -= 1
+    print()

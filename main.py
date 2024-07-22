@@ -61,7 +61,8 @@ def main():
             f"Completed in {int(time.time() - time_start)} sec"
         )
         
-    input("\n\nAll Files Completed")
+    print("\n\nAll Files Completed")
+    countdown("Exit", 3)
 
 if __name__ == "__main__":
     if not os.path.exists(INPUT_FOLDER):
