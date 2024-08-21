@@ -32,6 +32,6 @@ def get_annuaire_data():
     result = []
     df = pd.DataFrame(rows, columns=header)
     for _, row in df.iterrows():
-        full_name = unidecode(row["First Name"]+row["Last Name"]).replace(" ","").lower()
+        full_name = unidecode(row["First Name"]+row["Last Name"]).replace(" ","").replace("-", "").lower()
         result.append((full_name,row["Phone"],str(row["Email"]).strip()))
     return result

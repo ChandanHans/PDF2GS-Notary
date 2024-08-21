@@ -52,7 +52,7 @@ def get_image_result(image_path):
 def get_contact_from_sheet(name: str):
     annuaire_data = get_annuaire_data()
     for row in annuaire_data:
-        if row[0] == unidecode(name).replace(" ","").lower():
+        if row[0] == unidecode(name).replace(" ","").replace("-", "").lower():
             return row[1], row[2]
     return None, None
 
@@ -92,11 +92,12 @@ def get_contact_from_web(name: str):
 def get_contact(name):
     try:
         phone,email = get_contact_from_sheet(name)
-        if not email:
-            phone,email = get_contact_from_web(name)
+        # if not email:
+        #     phone,email = get_contact_from_web(name)
         return phone, email
-    except requests.RequestException:
+    except requests.RequestException as e:
         print()
+        print(e)
         raise Exception("No Network Connection")
 
 
