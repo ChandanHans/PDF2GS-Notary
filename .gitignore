@@ -11,3 +11,4 @@ PDF2XL.spec
 dist
 build
 /exe
+token.pickle
