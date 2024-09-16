@@ -55,7 +55,7 @@ def main():
             images = [
                 file for file in os.listdir(IMAGE_FOLDER) if file.lower().endswith(".png")
             ]
-            images = sorted(images, key=extract_number)[40:]
+            images = sorted(images, key=extract_number)
             data = []
 
             print("\nSTART :\n")
