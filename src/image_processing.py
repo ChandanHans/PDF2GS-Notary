@@ -3,23 +3,20 @@ import time
 import requests
 import platform
 import pytesseract
+import os
+import time
+from googleapiclient.http import MediaFileUpload
 from openai import OpenAI
 from bs4 import BeautifulSoup
 from functools import lru_cache
 from unidecode import unidecode
 
 from .annuaire_data import get_annuaire_data
+from .constants import IMAGE_FOLDER, SHEET_ID, FOLDER_ID1
 from .constants import *
 from .utils import *
 
 # image_processing.py
-
-import os
-import time
-from googleapiclient.http import MediaFileUpload
-from googleapiclient.discovery import build
-from .drive_upload import upload_to_drive
-from .constants import IMAGE_FOLDER, SHEET_ID, FOLDER_ID1
 
 
 def clean_name_for_comparison(name):

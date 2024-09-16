@@ -5,6 +5,8 @@ import time
 import shutil
 import pandas as pd
 from tqdm import tqdm
+from googleapiclient.discovery import build
+
 from src.pdf_processing import pdf_to_images
 from src.excel_util import save_table
 from src.image_processing import *
@@ -12,7 +14,7 @@ from src.utils import *
 from src.constants import *
 from src.drive_upload import authenticate_google_drive, upload_to_drive, convert_excel_to_google_sheet, delete_file_from_drive
 from src.annuaire_data import get_uploaded_pdfs
-5
+
 
 def main():
     # Authenticate Google Drive once and get the service instances
