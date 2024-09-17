@@ -3,7 +3,6 @@
 from functools import lru_cache
 import pickle
 import gspread
-from google.oauth2 import service_account
 from unidecode import unidecode
 import pandas as pd
 from src.constants import *
@@ -21,7 +20,8 @@ def get_uploaded_pdfs(name, drive_service, folder_id=None):
     Returns:
     List[str]: A list of matching PDF file names.
     """
-    query = f"mimeType = 'application/pdf' and trashed = false and name contains '{name}'"
+    escaped_name = name.replace("'", "\\'")
+    query = f"mimeType = 'application/pdf' and trashed = false and name contains '{escaped_name}'"
     
     if folder_id:
         query += f" and '{folder_id}' in parents"

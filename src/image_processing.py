@@ -1,15 +1,14 @@
-import subprocess
+import os
 import time
 import requests
 import platform
+import subprocess
 import pytesseract
-import os
-import time
-from googleapiclient.http import MediaFileUpload
 from openai import OpenAI
 from bs4 import BeautifulSoup
 from functools import lru_cache
 from unidecode import unidecode
+from googleapiclient.http import MediaFileUpload
 
 from .annuaire_data import get_annuaire_data
 from .constants import IMAGE_FOLDER, SHEET_ID, FOLDER_ID1
@@ -19,7 +18,7 @@ from .utils import *
 # image_processing.py
 
 
-def clean_name_for_comparison(name):
+def clean_name_for_comparison(name : str):
     """Clean the name by removing spaces, commas, and dashes."""
     return name.replace(" ", "").replace(",", "").replace("-", "").lower()
 
@@ -86,7 +85,7 @@ def get_image_result(image_path):
     if not found then ""
     json
     {
-        "dead person full name": "" (You can get it right at the beginning),
+        "dead person full name": "" (You can get it right at the beginning) ("" if you think this is not the full text from a death certificate),
         "Acte de notorieti": (date only) (dd/mm/yyyy),
         "certificate notary name": (after Acte de notorieti) (don't include Maitre) (only name)
     }

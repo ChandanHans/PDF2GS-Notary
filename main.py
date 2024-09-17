@@ -15,7 +15,7 @@ from src.excel_util import save_table
 from src.image_processing import *
 from src.utils import *
 from src.constants import *
-from src.drive_upload import authenticate_google_drive, upload_to_drive, convert_excel_to_google_sheet, delete_file_from_drive
+from src.drive_upload import *
 from src.annuaire_data import get_uploaded_pdfs
 
 
