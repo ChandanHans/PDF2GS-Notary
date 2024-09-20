@@ -26,7 +26,7 @@ def main():
     sheets_service = build('sheets', 'v4', credentials=creds)
 
 
-    existing_image_names = get_existing_image_names(sheets_service, SHEET_ID)
+    existing_images = get_existing_image_names(sheets_service, SHEET_ID)
 
 
     check_for_tesseract()
@@ -61,7 +61,7 @@ def main():
             print("\nSTART :\n")
             progress_bar = tqdm(images, ncols=60, bar_format="{percentage:3.0f}%|{bar}| {n_fmt}/{total_fmt}")
             for image in progress_bar:
-                result = process_image(image, drive_service, sheets_service,existing_image_names)  # Pass services
+                result = process_image(image, drive_service, sheets_service,existing_images)  # Pass services
                 if result:
                     data.append(result)
 
@@ -74,6 +74,7 @@ def main():
                 "Phone",            
                 "Email",
                 "Status",
+                "Image"
             ]
             save_table(df, excel_path)
 

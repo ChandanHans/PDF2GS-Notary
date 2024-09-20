@@ -22,7 +22,7 @@ def clean_name_for_comparison(name : str):
     """Clean the name by removing spaces, commas, and dashes."""
     return name.replace(" ", "").replace(",", "").replace("-", "").lower()
 
-def upload_image_and_append_sheet(name, image_path, drive_service, sheets_service, existing_entries=None):
+def upload_image_and_append_sheet(name, image_path, drive_service, sheets_service, existing_images=None):
     """
     Upload the image to Google Drive and append its name and link to a Google Sheet.
     
@@ -32,11 +32,12 @@ def upload_image_and_append_sheet(name, image_path, drive_service, sheets_servic
     cleaned_name = clean_name_for_comparison(name)
     
     # Check if the image already exists in the sheet
-    if existing_entries is None:
-        existing_entries = []  # Ensure there's an empty list if no data is passed
-    if any(cleaned_name in clean_name_for_comparison(entry[0]) for entry in existing_entries):
-        print(f"Image '{name}.png' already exists in the sheet. Skipping upload.")
-        return
+    if existing_images is None:
+        existing_images = []  # Ensure there's an empty list if no data is passed
+    for image in existing_images:
+        if cleaned_name in clean_name_for_comparison(image[0]):
+            print(f"Image '{name}.png' already exists in the sheet. Skipping upload.")
+            return image[1]
 
     # Upload the image to the folder
     file_metadata = {
@@ -57,6 +58,7 @@ def upload_image_and_append_sheet(name, image_path, drive_service, sheets_servic
         valueInputOption="RAW",
         body={"values": row_data}
     ).execute()
+    return file_link
 
 
 
@@ -67,7 +69,7 @@ def get_existing_image_names(sheets_service, sheet_id):
     """
     result = sheets_service.spreadsheets().values().get(
         spreadsheetId=sheet_id,
-        range='Sheet1!A:A'  # Assuming the image names are in column A
+        range='Sheet1!A:B'  # Assuming the image names are in column A
     ).execute()
     return result.get('values', [])
 
@@ -181,7 +183,7 @@ def process_image(image, drive_service, sheets_service, existing_images_names):
 
         print(f"     {image} in {int(time.time()-t)} sec", end="\r")
         
-        upload_image_and_append_sheet(name, image_path, drive_service, sheets_service, existing_images_names)
+        file_link = upload_image_and_append_sheet(name, image_path, drive_service, sheets_service, existing_images_names)
         result = [
             name,
             don,
@@ -189,6 +191,7 @@ def process_image(image, drive_service, sheets_service, existing_images_names):
             phone,
             email,
             None,
+            file_link
         ]
     except Exception as e:
         print(e)
