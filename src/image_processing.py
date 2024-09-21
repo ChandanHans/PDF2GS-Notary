@@ -87,30 +87,28 @@ openai_client = OpenAI(api_key=GPT_KEY)
 
 def get_image_result(image_path):
     text = pytesseract.image_to_string(image_path, lang="fra")
-    prompt = (
-        text
-        + """
-
-
-    Please filter unnecessary characters like (*,#)
-    if not found then ""
-    json
-    {
-        "dead person full name": "" (You can get it right at the beginning) ("" if you think this is not the full text from a death certificate),
-        "Acte de notorieti": (date only) (dd/mm/yyyy),
-        "certificate notary name": (after Acte de notorieti) (don't include Maitre) (only name)
-    }
-    """
-    )
     response = openai_client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
             {
+                "role": "system",
+                "content": """
+I will give you the full text from a death certificate. Your task is to extract specific information in a JSON format:
+
+Filter unnecessary characters like (*, #, ~, etc.)
+if not found or if you think this is not the full text from a death certificate then ""
+json
+{
+    "dead person full name": "" (You can get it right at the beginning),
+    "Acte de notorieti": (date only) (format dd/mm/yyyy),
+    "certificate notary name": (after Acte de notorieti) (don't include Maitre) (only name)
+}
+""",
+            },
+            {
                 "role": "user",
-                "content": [
-                    {"type": "text", "text": prompt},
-                ],
-            }
+                "content": text,
+            },
         ],
         response_format={"type": "json_object"},
         max_tokens=300,
