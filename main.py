@@ -77,15 +77,14 @@ def main():
                 "Image"
             ]
             save_table(df, excel_path)
-
-
         
             # Upload Excel to Google Drive and convert it to Google Sheet
             upload_to_drive(drive_service, pdf_path, FOLDER_ID2)
             excel_drive_id = upload_to_drive(drive_service, excel_path, FOLDER_ID2)
 
-            convert_excel_to_google_sheet(drive_service, excel_drive_id)
-
+            sheet_id = convert_excel_to_google_sheet(drive_service, excel_drive_id)
+            
+            apply_sheet_customizations(sheets_service, sheet_id)
             # After conversion, delete the Excel file from Google Drive
             delete_file_from_drive(drive_service, excel_drive_id)
         else:

@@ -18,19 +18,22 @@ from .utils import *
 # image_processing.py
 
 
-def clean_name_for_comparison(name : str):
+def clean_name_for_comparison(name: str):
     """Clean the name by removing spaces, commas, and dashes."""
     return name.replace(" ", "").replace(",", "").replace("-", "").lower()
 
-def upload_image_and_append_sheet(name, image_path, drive_service, sheets_service, existing_images=None):
+
+def upload_image_and_append_sheet(
+    name, image_path, drive_service, sheets_service, existing_images=None
+):
     """
     Upload the image to Google Drive and append its name and link to a Google Sheet.
-    
+
     If the image already exists in the sheet, skip upload and append.
     """
     # Clean the name for comparison
     cleaned_name = clean_name_for_comparison(name)
-    
+
     # Check if the image already exists in the sheet
     if existing_images is None:
         existing_images = []  # Ensure there's an empty list if no data is passed
@@ -40,15 +43,16 @@ def upload_image_and_append_sheet(name, image_path, drive_service, sheets_servic
             return image[1]
 
     # Upload the image to the folder
-    file_metadata = {
-        'name': f"Acte de décès - {name}.png",
-        'parents': [FOLDER_ID1]
-    }
-    media = MediaFileUpload(image_path, mimetype='image/png')
-    uploaded_file = drive_service.files().create(body=file_metadata, media_body=media, fields='id, webViewLink').execute()
+    file_metadata = {"name": f"Acte de décès - {name}.png", "parents": [FOLDER_ID1]}
+    media = MediaFileUpload(image_path, mimetype="image/png")
+    uploaded_file = (
+        drive_service.files()
+        .create(body=file_metadata, media_body=media, fields="id, webViewLink")
+        .execute()
+    )
 
     # Get the file ID and web link
-    file_link = uploaded_file.get('webViewLink')
+    file_link = uploaded_file.get("webViewLink")
 
     # Append the image name and link to the Google Sheet
     row_data = [[f"Acte de décès - {name}.png", file_link]]
@@ -56,10 +60,9 @@ def upload_image_and_append_sheet(name, image_path, drive_service, sheets_servic
         spreadsheetId=SHEET_ID,
         range="Sheet1!A:B",
         valueInputOption="RAW",
-        body={"values": row_data}
+        body={"values": row_data},
     ).execute()
     return file_link
-
 
 
 def get_existing_image_names(sheets_service, sheet_id):
@@ -67,11 +70,17 @@ def get_existing_image_names(sheets_service, sheet_id):
     Retrieve and cache the existing image names from the Google Sheet.
     This function is called once to avoid multiple requests to the sheet.
     """
-    result = sheets_service.spreadsheets().values().get(
-        spreadsheetId=sheet_id,
-        range='Sheet1!A:B'  # Assuming the image names are in column A
-    ).execute()
-    return result.get('values', [])
+    result = (
+        sheets_service.spreadsheets()
+        .values()
+        .get(
+            spreadsheetId=sheet_id,
+            range="Sheet1!A:B",  # Assuming the image names are in column A
+        )
+        .execute()
+    )
+    return result.get("values", [])
+
 
 openai_client = OpenAI(api_key=GPT_KEY)
 
@@ -109,12 +118,14 @@ def get_image_result(image_path):
     result = eval(response.choices[0].message.content)
     return result
 
+
 def get_contact_from_sheet(name: str):
     annuaire_data = get_annuaire_data()
     for row in annuaire_data:
-        if row[0] == unidecode(name).replace(" ","").replace("-", "").lower():
+        if row[0] == unidecode(name).replace(" ", "").replace("-", "").lower():
             return row[1], row[2]
     return None, None
+
 
 def get_contact_from_web(name: str):
     url = f"https://www.notaires.fr/en/directory/notaries?name={name}"
@@ -145,13 +156,13 @@ def get_contact_from_web(name: str):
             if email_button:
                 email = email_button["href"]
 
-                
     return phone, email
-        
+
+
 @lru_cache(maxsize=None)
 def get_contact(name):
     try:
-        phone,email = get_contact_from_sheet(name)
+        phone, email = get_contact_from_sheet(name)
         # if not email:
         #     phone,email = get_contact_from_web(name)
         return phone, email
@@ -160,13 +171,14 @@ def get_contact(name):
         print(e)
         raise Exception("No Network Connection")
 
+
 def process_image(image, drive_service, sheets_service, existing_images_names):
     result = None
     try:
         t = time.time()
         notary = don = None
         image_path = f"{IMAGE_FOLDER}/{image}"
-        image_result : dict[str,str] = get_image_result(image_path)
+        image_result: dict[str, str] = get_image_result(image_path)
         name, don, notary = image_result.values()
         if notary:
             while True:
@@ -182,17 +194,11 @@ def process_image(image, drive_service, sheets_service, existing_images_names):
             phone = email = notary = None
 
         print(f"     {image} in {int(time.time()-t)} sec", end="\r")
-        
-        file_link = upload_image_and_append_sheet(name, image_path, drive_service, sheets_service, existing_images_names)
-        result = [
-            name,
-            don,
-            notary,
-            phone,
-            email,
-            None,
-            file_link
-        ]
+
+        file_link = upload_image_and_append_sheet(
+            name, image_path, drive_service, sheets_service, existing_images_names
+        )
+        result = [name, don, notary, phone, email, "à envoyer", file_link]
     except Exception as e:
         print(e)
 
