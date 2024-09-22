@@ -50,7 +50,7 @@ def main():
         if pdf_name not in get_uploaded_pdfs(pdf_name,drive_service,FOLDER_ID2):
 
             # Convert PDF to images
-            pdf_to_images(pdf_path, IMAGE_FOLDER, 200)
+            pdf_to_images(pdf_path, IMAGE_FOLDER, 200, 3)
 
             images = [
                 file for file in os.listdir(IMAGE_FOLDER) if file.lower().endswith(".png")

@@ -88,7 +88,7 @@ openai_client = OpenAI(api_key=GPT_KEY)
 def get_image_result(image_path):
     text = pytesseract.image_to_string(image_path, lang="fra")
     response = openai_client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         messages=[
             {
                 "role": "system",
