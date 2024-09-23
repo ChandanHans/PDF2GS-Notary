@@ -91,6 +91,13 @@ def get_image_result(image_path):
         + text
         + """
 
+Please format the output as a JSON object, following this structure exactly:
+{
+    "Dead person full name": "" (You can get it right at the beginning),
+    "Acte de notorieti": "" (date only) (format dd/mm/yyyy),
+    "Certificate notary name": "" (Name of the notary mentioned after "Acte de notorieti") (omit the title "Maitre" and only include the name).
+}
+
 1. Filter unnecessary characters like (*, #, ~, etc.)
 2. if not found or if you think this is not the full text from a death certificate then ""
 3. Ensure the following:
@@ -98,12 +105,6 @@ def get_image_result(image_path):
     - Correct obvious misspellings where applicable.
     - Return the result in the exact JSON format.
 
-4. Please format the output as a JSON object, following this structure exactly:
-{
-    "dead person full name": "",  // Extract from the beginning of the text, ensuring the first name is lowercase and the LAST NAME is uppercase.
-    "Acte de notorieti": "",      // Extract the date related to "Acte de notorieti" in the format dd/mm/yyyy.
-    "certificate notary name": "" // Extract the name of the notary mentioned after "Acte de notorieti" (omit the title "Maitre" and only include the name).
-}
 """)
     response = openai_client.chat.completions.create(
         model="gpt-3.5-turbo",
