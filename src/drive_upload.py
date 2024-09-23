@@ -2,9 +2,11 @@
 
 import os
 import pickle
+import time
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from googleapiclient.http import MediaFileUpload
+from googleapiclient.errors import HttpError
 import requests
 
 from .constants import CREDS_JSON, TOKEN_FILE
@@ -105,7 +107,7 @@ def get_sheet_id_by_name(sheets_service, spreadsheet_id, sheet_name):
     return None  # Return None if the sheet with the given name is not found
 
 
-def apply_sheet_customizations(sheets_service, spreadsheet_id):
+def apply_sheet_customizations(sheets_service, spreadsheet_id, validation_column = 5):
     """
     Apply dropdown, conditional formatting, and cell color verification to a Google Sheet.
 
@@ -127,13 +129,13 @@ def apply_sheet_customizations(sheets_service, spreadsheet_id):
     # Apply dropdown (data validation) to column F (zero-based, so col 5 means column F)
     color_options = ["à envoyer", "draft", "envoyé", "pas trouvé"]
     apply_data_validation(
-        sheets_service, spreadsheet_id, sheet_id, 5, rows, color_options
+        sheets_service, spreadsheet_id, sheet_id, validation_column, rows, color_options
     )
 
     # Apply conditional formatting to column F (zero-based, so col 5 means column F)
     color_codes = ["#ff8e8e", "#ffeeb0", "#b2ffaf", "#daeef3"]
     apply_conditional_formatting(
-        sheets_service, spreadsheet_id, sheet_id, 5, rows, color_options, color_codes
+        sheets_service, spreadsheet_id, sheet_id, validation_column, rows, color_options, color_codes
     )
 
     # Apply cell verification and color to columns A and C, skip column D
@@ -252,7 +254,7 @@ def apply_cell_color_verification(sheets_service, spreadsheet_id, sheet_id, rows
             if col_letter == "A":
                 # Check if at least one word is uppercase in column A
                 condition_formula = (
-                    f'=OR(ISBLANK(A{row}), NOT(REGEXMATCH(A{row}, "\\b[A-Z]+\\b")))'
+                    f'=OR(EXACT(A{row}, UPPER(A{row})), NOT(REGEXMATCH(A{row}, "\\b[A-Z]+\\b")))'
                 )
             else:
                 # Check if the cell is empty for column C
@@ -298,15 +300,28 @@ def apply_cell_color_verification(sheets_service, spreadsheet_id, sheet_id, rows
     ).execute()
 
 
-def convert_excel_to_google_sheet(drive_service, file_id):
-    """Convert an uploaded Excel file to a Google Sheet."""
+def convert_excel_to_google_sheet(drive_service, file_id, retries=5):
+    """Convert an uploaded Excel file to a Google Sheet with exponential backoff."""
     file_metadata = {"mimeType": "application/vnd.google-apps.spreadsheet"}
-    converted_file = (
-        drive_service.files()
-        .copy(fileId=file_id, body=file_metadata, fields="id, webViewLink")
-        .execute()
-    )
-    print(
-        f"Excel file converted to Google Sheet with file ID {converted_file.get('id')}"
-    )
-    return converted_file.get("id")
+    delay = 1
+    
+    for attempt in range(retries):
+        try:
+            converted_file = (
+                drive_service.files()
+                .copy(fileId=file_id, body=file_metadata, fields="id, webViewLink")
+                .execute()
+            )
+            print(f"Excel file converted to Google Sheet with file ID {converted_file.get('id')}")
+            return converted_file.get("id")
+        
+        except HttpError as error:
+            if error.resp.status == 403 and 'userRateLimitExceeded' in str(error):
+                print(f"Rate limit exceeded, retrying in {delay} seconds...")
+                time.sleep(delay)
+                delay *= 2  # Exponential backoff
+            else:
+                print(f"An error occurred: {error}")
+                raise  # Raise other errors if not rate-limit related
+    
+    raise Exception("Max retries reached. Could not convert the file.")

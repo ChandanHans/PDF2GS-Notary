@@ -6,7 +6,6 @@ import subprocess
 import pytesseract
 from openai import OpenAI
 from bs4 import BeautifulSoup
-from functools import lru_cache
 from unidecode import unidecode
 from googleapiclient.http import MediaFileUpload
 
@@ -87,27 +86,31 @@ openai_client = OpenAI(api_key=GPT_KEY)
 
 def get_image_result(image_path):
     text = pytesseract.image_to_string(image_path, lang="fra")
+    prompt = (
+        "Text:\n"
+        + text
+        + """
+
+1. Filter unnecessary characters like (*, #, ~, etc.)
+2. if not found or if you think this is not the full text from a death certificate then ""
+3. Ensure the following:
+    - If any of the fields are not present, leave them as an empty string ("").
+    - Correct obvious misspellings where applicable.
+    - Return the result in the exact JSON format.
+
+4. Please format the output as a JSON object, following this structure exactly:
+{
+    "dead person full name": "",  // Extract from the beginning of the text, ensuring the first name is lowercase and the LAST NAME is uppercase.
+    "Acte de notorieti": "",      // Extract the date related to "Acte de notorieti" in the format dd/mm/yyyy.
+    "certificate notary name": "" // Extract the name of the notary mentioned after "Acte de notorieti" (omit the title "Maitre" and only include the name).
+}
+""")
     response = openai_client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-3.5-turbo",
         messages=[
             {
-                "role": "system",
-                "content": """
-I will give you the full text from a death certificate. Your task is to extract specific information in a JSON format:
-
-Filter unnecessary characters like (*, #, ~, etc.)
-if not found or if you think this is not the full text from a death certificate then ""
-json
-{
-    "dead person full name": "" (You can get it right at the beginning),
-    "Acte de notorieti": (date only) (format dd/mm/yyyy),
-    "certificate notary name": (after Acte de notorieti) (don't include Maitre) (only name)
-}
-""",
-            },
-            {
                 "role": "user",
-                "content": text,
+                "content": prompt,
             },
         ],
         response_format={"type": "json_object"},
@@ -117,7 +120,7 @@ json
     return result
 
 
-def get_contact_from_sheet(name: str):
+def get_contact(name: str):
     annuaire_data = get_annuaire_data()
     for row in annuaire_data:
         if row[0] == unidecode(name).replace(" ", "").replace("-", "").lower():
@@ -155,19 +158,6 @@ def get_contact_from_web(name: str):
                 email = email_button["href"]
 
     return phone, email
-
-
-@lru_cache(maxsize=None)
-def get_contact(name):
-    try:
-        phone, email = get_contact_from_sheet(name)
-        # if not email:
-        #     phone,email = get_contact_from_web(name)
-        return phone, email
-    except requests.RequestException as e:
-        print()
-        print(e)
-        raise Exception("No Network Connection")
 
 
 def process_image(image, drive_service, sheets_service, existing_images_names):

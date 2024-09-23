@@ -84,7 +84,7 @@ def main():
 
             sheet_id = convert_excel_to_google_sheet(drive_service, excel_drive_id)
             
-            apply_sheet_customizations(sheets_service, sheet_id)
+            apply_sheet_customizations(sheets_service, sheet_id, 5)
             # After conversion, delete the Excel file from Google Drive
             delete_file_from_drive(drive_service, excel_drive_id)
         else:
