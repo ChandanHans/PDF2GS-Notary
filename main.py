@@ -16,7 +16,7 @@ from src.image_processing import *
 from src.utils import *
 from src.constants import *
 from src.drive_upload import *
-from src.annuaire_data import get_uploaded_pdfs
+from src.annuaire_data import get_uploaded_sheets
 
 
 def main():
@@ -47,7 +47,7 @@ def main():
 
         time_start = time.time()
         print(f"\nProcess Started For {pdf_name}\n")
-        if pdf_name not in get_uploaded_pdfs(pdf_name,drive_service,FOLDER_ID2):
+        if pdf_name.replace(".pdf", "") not in get_uploaded_sheets(drive_service, pdf_name, FOLDER_ID2):
 
             # Convert PDF to images
             pdf_to_images(pdf_path, IMAGE_FOLDER, 200, 3)

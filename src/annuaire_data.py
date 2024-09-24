@@ -8,9 +8,9 @@ import pandas as pd
 from src.constants import *
 from src.utils import *
 
-def get_uploaded_pdfs(name, drive_service, folder_id=None):
+def get_uploaded_sheets(drive_service, pdf_name : str, folder_id=None):
     """
-    Retrieve the list of PDF file names from Google Drive that contain the given name.
+    Retrieve the list of Google Sheets file names from Google Drive that contain the given name.
     
     Parameters:
     name (str): The name to search for in the file names.
@@ -18,15 +18,15 @@ def get_uploaded_pdfs(name, drive_service, folder_id=None):
     folder_id (str): Optional, the ID of the folder to search in. If None, searches all files.
 
     Returns:
-    List[str]: A list of matching PDF file names.
+    List[str]: A list of matching Google Sheets file names.
     """
-    escaped_name = name.replace("'", "\\'")
-    query = f"mimeType = 'application/pdf' and trashed = false and name contains '{escaped_name}'"
+    escaped_name = pdf_name.replace("'", "\\'").replace(".pdf", "")
+    query = f"mimeType = 'application/vnd.google-apps.spreadsheet' and trashed = false and name contains '{escaped_name}'"
     
     if folder_id:
         query += f" and '{folder_id}' in parents"
-    
-    results = drive_service.files().list(q=query, fields="files(id, name)").execute()
+    request = drive_service.files().list(q=query, fields="files(id, name)")
+    results = execute_with_retry(request)
     files = results.get('files', [])
 
     # Return a list of file names
