@@ -42,25 +42,23 @@ def upload_image_and_append_sheet(
             return image[1]
 
     # Upload the image to the folder
-    file_metadata = {"name": f"Acte de décès - {name}.png", "parents": [FOLDER_ID1]}
+    file_name = f"Acte de décès - {name}.png"
+    file_metadata = {"name": file_name, "parents": [FOLDER_ID1]}
     media = MediaFileUpload(image_path, mimetype="image/png")
-    uploaded_file = (
-        drive_service.files()
-        .create(body=file_metadata, media_body=media, fields="id, webViewLink")
-        .execute()
-    )
-
+    request = drive_service.files().create(body=file_metadata, media_body=media, fields="id, webViewLink")
+    uploaded_file = execute_with_retry(request)
     # Get the file ID and web link
     file_link = uploaded_file.get("webViewLink")
 
     # Append the image name and link to the Google Sheet
-    row_data = [[f"Acte de décès - {name}.png", file_link]]
-    sheets_service.spreadsheets().values().append(
+    row_data = [file_name, file_link]
+    request = sheets_service.spreadsheets().values().append(
         spreadsheetId=SHEET_ID,
         range="Sheet1!A:B",
         valueInputOption="RAW",
-        body={"values": row_data},
-    ).execute()
+        body={"values": [row_data]},
+    )
+    execute_with_retry(request)
     return file_link
 
 
@@ -69,15 +67,11 @@ def get_existing_image_names(sheets_service, sheet_id):
     Retrieve and cache the existing image names from the Google Sheet.
     This function is called once to avoid multiple requests to the sheet.
     """
-    result = (
-        sheets_service.spreadsheets()
-        .values()
-        .get(
+    request = sheets_service.spreadsheets().values().get(
             spreadsheetId=sheet_id,
-            range="Sheet1!A:B",  # Assuming the image names are in column A
+            range="Sheet1!A:B", 
         )
-        .execute()
-    )
+    result = execute_with_retry(request)
     return result.get("values", [])
 
 
@@ -91,12 +85,6 @@ def get_image_result(image_path):
         + text
         + """
 
-Please format the output as a JSON object, following this structure exactly:
-{
-    "Dead person full name": "" (You can get it right at the beginning),
-    "Acte de notorieti": "" (date only) (format dd/mm/yyyy),
-    "Certificate notary name": "" (Name of the notary mentioned after "Acte de notorieti") (omit the title "Maitre" and only include the name).
-}
 
 1. Filter unnecessary characters like (*, #, ~, etc.)
 2. If you think this is not the full text from a death certificate then ""
@@ -104,7 +92,14 @@ Please format the output as a JSON object, following this structure exactly:
     - If any of the fields are not present, leave them as an empty string ("").
     - Return the result in the exact JSON format.
 
+Please format the output as a JSON object, following this structure exactly:
+{
+    "Dead person full name": "" (You can get it right at the beginning),
+    "Acte de notorieti": "" (date only) (format dd/mm/yyyy),
+    "Certificate notary name": "" (Name of the notary mentioned after "Acte de notorieti") (omit the title "Maitre" and only include the name).
+}
 """)
+    
     response = openai_client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
