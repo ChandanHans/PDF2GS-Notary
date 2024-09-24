@@ -99,10 +99,9 @@ Please format the output as a JSON object, following this structure exactly:
 }
 
 1. Filter unnecessary characters like (*, #, ~, etc.)
-2. if not found or if you think this is not the full text from a death certificate then ""
+2. If you think this is not the full text from a death certificate then ""
 3. Ensure the following:
     - If any of the fields are not present, leave them as an empty string ("").
-    - Correct obvious misspellings where applicable.
     - Return the result in the exact JSON format.
 
 """)
