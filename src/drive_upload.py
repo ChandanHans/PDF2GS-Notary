@@ -62,6 +62,7 @@ def authenticate_google_drive():
     with open(TOKEN_FILE, "wb") as token:
         pickle.dump(creds, token)
 
+    return creds
 
 def upload_to_drive(service, file_path, folder_id):
     """Upload a file to Google Drive."""
