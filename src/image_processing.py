@@ -86,8 +86,9 @@ def get_image_result(image_path):
 
 
 1. Filter unnecessary characters like (*, #, ~, etc.)
-2. If you think this is not the full text from a death certificate then ""
-3. Ensure the following:
+2. case sensitive so Don't change any case because I Identify fname and lname with case.
+3. If you think this is not the full text from a death certificate then ""
+4. Ensure the following:
     - If any of the fields are not present, leave them as an empty string ("").
     - Return the result in the exact JSON format.
 
@@ -100,7 +101,7 @@ Please format the output as a JSON object, following this structure exactly:
 """)
     
     response = openai_client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         messages=[
             {
                 "role": "user",
