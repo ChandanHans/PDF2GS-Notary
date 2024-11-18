@@ -42,7 +42,7 @@ def upload_image_and_append_sheet(
 
     # Upload the image to the folder
     file_name = f"Acte de décès - {name}.png"
-    file_metadata = {"name": file_name, "parents": [FOLDER_ID1]}
+    file_metadata = {"name": file_name, "parents": [DEATH_CERTIFICATES_FOLDER_ID]}
     media = MediaFileUpload(image_path, mimetype="image/png")
     request = drive_service.files().create(body=file_metadata, media_body=media, fields="id, webViewLink")
     uploaded_file = execute_with_retry(request)
